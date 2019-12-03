@@ -141,6 +141,13 @@ func NextMonth() []time.Time {
 	return aMonth(time.Now().AddDate(0, 1, 0))
 }
 
+/*
+MonthOf returns a slice containing all dates that occur in the specific month
+*/
+func MonthOf(date time.Time) []time.Time {
+	return aMonth(date)
+}
+
 func aYear(baseDate time.Time) []time.Time {
 	// This is used for subtraction, so the first day of the month needs to be a 0 instead of a 1
 	dom := baseDate.YearDay() - 1

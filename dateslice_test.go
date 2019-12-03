@@ -46,6 +46,31 @@ func TestWeekSlice(t *testing.T) {
 	}
 }
 
+func TestMonthSlice(t *testing.T) {
+	var monthTest = []struct {
+		Date              time.Time
+		ExpectedCount     int
+		ExpectedFirstDate time.Time
+	}{
+		{time.Date(2017, time.April, 1, 5, 0, 0, 0, time.UTC), 30, time.Date(2017, time.April, 1, 5, 0, 0, 0, time.UTC)},
+		{time.Date(2016, time.February, 29, 5, 0, 0, 0, time.UTC), 29, time.Date(2016, time.February, 1, 5, 0, 0, 0, time.UTC)},
+		{time.Date(2003, time.January, 3, 5, 0, 0, 0, time.UTC), 31, time.Date(2003, time.January, 1, 5, 0, 0, 0, time.UTC)},
+	}
+
+	for _, ex := range monthTest {
+		ds := MonthOf(ex.Date)
+		if len(ds) != ex.ExpectedCount {
+			t.Errorf("Unexpected number of elements in monthly test %d vs %d\n", ex.ExpectedCount, len(ds))
+		}
+		if ds[0].Year() != ex.ExpectedFirstDate.Year() {
+			t.Errorf("Unexpected year in weekly test %d vs %d\n", ex.ExpectedFirstDate.Year(), ds[0].Year())
+		}
+		if ds[0].YearDay() != ex.ExpectedFirstDate.YearDay() {
+			t.Errorf("Unexpected day of year in weekly test %d vs %d\n", ex.ExpectedFirstDate.YearDay(), ds[0].YearDay())
+		}
+	}
+}
+
 func TestRangeSlice(t *testing.T) {
 	var rangeTest = []struct {
 		BegDate           time.Time
