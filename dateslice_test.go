@@ -1,5 +1,5 @@
 /*
-	Copyright 2019 Brian Bauer
+	Copyright 2022 Brian Bauer
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -63,10 +63,39 @@ func TestMonthSlice(t *testing.T) {
 			t.Errorf("Unexpected number of elements in monthly test %d vs %d\n", ex.ExpectedCount, len(ds))
 		}
 		if ds[0].Year() != ex.ExpectedFirstDate.Year() {
-			t.Errorf("Unexpected year in weekly test %d vs %d\n", ex.ExpectedFirstDate.Year(), ds[0].Year())
+			t.Errorf("Unexpected year in monthly test %d vs %d\n", ex.ExpectedFirstDate.Year(), ds[0].Year())
 		}
 		if ds[0].YearDay() != ex.ExpectedFirstDate.YearDay() {
-			t.Errorf("Unexpected day of year in weekly test %d vs %d\n", ex.ExpectedFirstDate.YearDay(), ds[0].YearDay())
+			t.Errorf("Unexpected day of year in monthly test %d vs %d\n", ex.ExpectedFirstDate.YearDay(), ds[0].YearDay())
+		}
+	}
+}
+
+func TestYearSlice(t *testing.T) {
+	var yearTest = []struct {
+		Date              time.Time
+		ExpectedCount     int
+		ExpectedFirstDate time.Time
+		ExpectedLastDate  time.Time
+	}{
+		{time.Date(2017, time.April, 1, 5, 0, 0, 0, time.UTC), 365, time.Date(2017, time.January, 1, 5, 0, 0, 0, time.UTC), time.Date(2017, time.December, 31, 5, 0, 0, 0, time.UTC)},
+		{time.Date(2016, time.February, 29, 5, 0, 0, 0, time.UTC), 366, time.Date(2016, time.January, 1, 5, 0, 0, 0, time.UTC), time.Date(2016, time.December, 31, 5, 0, 0, 0, time.UTC)},
+		{time.Date(2003, time.January, 3, 5, 0, 0, 0, time.UTC), 365, time.Date(2003, time.January, 1, 5, 0, 0, 0, time.UTC), time.Date(2003, time.December, 31, 5, 0, 0, 0, time.UTC)},
+	}
+
+	for _, ex := range yearTest {
+		ds := YearOf(ex.Date)
+		if len(ds) != ex.ExpectedCount {
+			t.Errorf("Unexpected number of elements in yearly test %d vs %d\n", ex.ExpectedCount, len(ds))
+		}
+		if ds[0].Year() != ex.ExpectedFirstDate.Year() {
+			t.Errorf("Unexpected year in yearly test %d vs %d\n", ex.ExpectedFirstDate.Year(), ds[0].Year())
+		}
+		if ds[0].YearDay() != ex.ExpectedFirstDate.YearDay() {
+			t.Errorf("Unexpected day of year in yearly test %d vs %d\n", ex.ExpectedFirstDate.YearDay(), ds[0].YearDay())
+		}
+		if ds[len(ds)-1].YearDay() != ex.ExpectedLastDate.YearDay() {
+			t.Errorf("Unexpected day of year in yearly test %d vs %d\n", ex.ExpectedFirstDate.YearDay(), ds[0].YearDay())
 		}
 	}
 }
