@@ -1,5 +1,5 @@
 /*
-	Copyright 2019 Brian Bauer
+	Copyright 2022 Brian Bauer
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,44 +15,46 @@
 */
 
 /*
-Package dateslice creates slices containing time.Time elements
+Package dateslice creates slices containing time.Time elements.
+
+Sometimes you need a slice of dates.  Here are some functions that make that
+	a little easier.
 */
 package dateslice
 
 import (
 	"fmt"
 	"math"
-	"strconv"
 	"strings"
 	"time"
 )
 
 /*
-Sometimes you need a slice of dates.  Here are some functions that make that
-	a little easier.
-*/
-
-/*
-Today returns a slice containing a single element - the current day
+Today returns a slice containing a single element - the current day.
 */
 func Today() []time.Time {
 	return []time.Time{time.Now()}
 }
 
 /*
-Yesterday returns a slice containing a single element - yesterday
+Yesterday returns a slice containing a single element - yesterday.
 */
 func Yesterday() []time.Time {
 	return []time.Time{time.Now().AddDate(0, 0, -1)}
 }
 
 /*
-Tomorrow returns a slice containing a single element - tomorrow
+Tomorrow returns a slice containing a single element - tomorrow.
 */
 func Tomorrow() []time.Time {
 	return []time.Time{time.Now().AddDate(0, 0, 1)}
 }
 
+/*
+aWeek is an internal function that is used to create a
+	slice of dates for the full week containing the
+	basedate.
+*/
 func aWeek(baseDate time.Time) []time.Time {
 	ds := make([]time.Time, 7)
 
@@ -100,6 +102,11 @@ func NextWeek() []time.Time {
 	return aWeek(time.Now().AddDate(0, 0, 7))
 }
 
+/*
+aMonth is an internal function that is used to create a
+	slice of dates for the full month containing the
+	basedate.
+*/
 func aMonth(baseDate time.Time) []time.Time {
 	// This is used for subtraction, so the first day of the month needs to be a 0 instead of a 1
 	dom := baseDate.Day() - 1
@@ -148,6 +155,11 @@ func MonthOf(date time.Time) []time.Time {
 	return aMonth(date)
 }
 
+/*
+aYear is an internal function that is used to create a
+	slice of dates for the full year containing the
+	basedate.
+*/
 func aYear(baseDate time.Time) []time.Time {
 	// This is used for subtraction, so the first day of the month needs to be a 0 instead of a 1
 	dom := baseDate.YearDay() - 1
@@ -169,6 +181,34 @@ func aYear(baseDate time.Time) []time.Time {
 }
 
 /*
+ThisYear returns a slice containing all dates that occur this year
+*/
+func ThisYear() []time.Time {
+	return aYear(time.Now())
+}
+
+/*
+LastYear returns a slice containing all dates that occured last year
+*/
+func LastYear() []time.Time {
+	return aYear(time.Now().AddDate(-1, 0, 0))
+}
+
+/*
+NextYear returns a slice containing all dates that will occur next year
+*/
+func NextYear() []time.Time {
+	return aYear(time.Now().AddDate(1, 0, 0))
+}
+
+/*
+YearOf returns a slice containing all dates that occur in the specific year
+*/
+func YearOf(date time.Time) []time.Time {
+	return aYear(date)
+}
+
+/*
 Range returns a slices of dates specified in the range
 */
 func Range(beg, end time.Time) []time.Time {
@@ -185,15 +225,27 @@ func Range(beg, end time.Time) []time.Time {
 
 /*
 RangeString transforms a beginning and ending date from strings into dates and then returns
-	the results of the Range function
+	the results of the Range function.  Date strings are passed in the ISO8601 format.  If
+	the beginning date string does not contain a full date, it is assumed to be the start of the period
+	and if the ending date string does not contain a full date, it is assumed to be the end of the period.
+
+
+	Examples:
+	20060102 - 02 January 2006
+	202104 - April 2021
+		begDt is treated as 01 April 2021
+		endDt is treated as 31 April 2021
+	2022 - The year 2022
+		begDt is treaded as 01 January 2022
+		endDt is treated as 31 December 2022
 */
 func RangeString(begDt, endDt string) []time.Time {
 	if len(begDt) == 6 {
-		//Treat this as the beginning of a month
+		//Treat this as the beginning of a month (ex. 202101 is January 2021)
 		begDt += "01"
 	}
 	if len(begDt) == 4 {
-		//Treat this as the beginning of a year
+		//Treat this as the beginning of a year (ex. 2022 is the year 2022)
 		begDt += "0101"
 	}
 	if len(endDt) == 6 {
@@ -266,32 +318,6 @@ func DateObjectsToSlice(dateString, begDt, endDt string) (ds []time.Time) {
 		} else {
 			ds = RangeString(begDt, begDt)
 		}
-	}
-	return
-}
-
-/*
-ParseDate tries to figure out what is being asked for
-*/
-func ParseDate(dateString, rangeType string) (ds []time.Time) {
-	switch rangeType {
-	case "daily":
-		if strings.EqualFold(dateString, "today") {
-			ds = Today()
-		} else if strings.EqualFold(dateString, "yesterday") {
-			ds = Yesterday()
-		} else if _, err := strconv.Atoi(dateString); err == nil {
-			ds = RangeString(dateString, dateString)
-		}
-	case "weekly":
-		if strings.EqualFold(dateString, "current") {
-			ds = ThisWeek()
-		} else if strings.EqualFold(dateString, "last") {
-			ds = LastWeek()
-		} else if _, err := strconv.Atoi(dateString); err == nil {
-
-		}
-	case "monthly":
 	}
 	return
 }
