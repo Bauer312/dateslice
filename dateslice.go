@@ -51,6 +51,13 @@ func Tomorrow() []time.Time {
 }
 
 /*
+DayBefore returns a slice containing a single element - the day before the provided date.
+*/
+func DayBefore(d time.Time) []time.Time {
+	return []time.Time{d.AddDate(0, 0, -1)}
+}
+
+/*
 aWeek is an internal function that is used to create a
 	slice of dates for the full week containing the
 	basedate.
