@@ -1,3 +1,3 @@
-module 13fpl.com/dateslice
+module github.com/Bauer312/dateslice
 
 go 1.17
